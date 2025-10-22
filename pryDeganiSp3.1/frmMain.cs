@@ -16,7 +16,7 @@ namespace pryDeganiSp3._1
         //Constante para la cantidad de elementos del arreglo
         const int MAX = 50;
         //Declaracion del arreglo de Turnos
-        public TURNO[] turnos;
+        public TURNO[] turnos = new TURNO[MAX];
         //Variable para el control de elementos cargados en el arreglo
         int indice = 0;
 
@@ -27,12 +27,17 @@ namespace pryDeganiSp3._1
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-            //creacion del arreglo de Turnos
             turnos = new TURNO[MAX];
-            //inicializacion del indice
             indice = 0;
-            //establecer estado inicial de componentes graficos
             InicializarInterface();
+
+            numAnioFabricacion.Minimum = 1950;
+            numAnioFabricacion.Maximum = DateTime.Now.Year;
+            numAnioFabricacion.Value = DateTime.Now.Year;
+
+            txtDominio.MaxLength = 7;
+            txtTitular.MaxLength = 30;
+            txtNumTurno.MaxLength = 5;
         }
         private void InicializarInterface()
         {
@@ -48,37 +53,76 @@ namespace pryDeganiSp3._1
             numAnioFabricacion.Value = 2021;
             txtTitular.Clear();
             txtNumTurno.Clear();
+            txtDominio.CharacterCasing = CharacterCasing.Upper;
         }
 
         private bool validarDatosIngresados()
         {
-            bool resultado = false; //suponemos que los datos son incorrectos
-            if (txtNumTurno.Text != "" && txtDominio.Text != "" && txtTitular.Text != "")
+            // N° turno requerido y entero hasta 5 dígitos, y no repetido
+            if (!int.TryParse(txtNumTurno.Text, out int nroTurno))
             {
-                if (txtDominio.Text.Length >= 6)
-                {
-                    if (!buscarTurno(int.Parse(txtNumTurno.Text)))
-                    {
-                        resultado = true; //los datos son correctos
-                    }
-                    else
-                    {
-                        MessageBox.Show("El numero de turno ya existe", "Error de validacion", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        txtNumTurno.Focus();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("El dominio debe tener 6 caracteres", "Error de validacion", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    txtDominio.Focus();
-                }
+                MessageBox.Show("El número de turno debe ser entero.", "Error de validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtNumTurno.Focus();
+                return false;
+            }
+            if (nroTurno < 0 || nroTurno > 99999)
+            {
+                MessageBox.Show("El número de turno debe tener hasta 5 dígitos.", "Error de validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtNumTurno.Focus();
+                return false;
+            }
+            if (buscarTurno(nroTurno))
+            {
+                MessageBox.Show("El número de turno ya existe.", "Error de validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtNumTurno.Focus();
+                return false;
+            }
 
-            }
-            else
+            // Dominio: 6 o 7, solo A-Z y 0-9
+            string dominio = (txtDominio.Text ?? "").Trim().ToUpperInvariant();
+            if (dominio.Length < 6 || dominio.Length > 7)
             {
-                MessageBox.Show("Faltan ingresar datos obligatorios", "Error de validacion", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("El dominio debe tener 6 o 7 caracteres.", "Error de validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtDominio.Focus();
+                return false;
             }
-            return resultado;
+            foreach (char c in dominio)
+            {
+                if (!char.IsLetterOrDigit(c) || (char.IsLetter(c) && !char.IsUpper(c)))
+                {
+                    MessageBox.Show("El dominio solo admite MAYÚSCULAS y números.", "Error de validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtDominio.Focus();
+                    return false;
+                }
+            }
+
+            // Año: 1950..año actual (usás NumericUpDown: perfecto)
+            int anio = (int)numAnioFabricacion.Value;
+            int actual = DateTime.Now.Year;
+            if (anio < 1950 || anio > actual)
+            {
+                MessageBox.Show($"El año de fabricación debe estar entre 1950 y {actual}.", "Error de validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                numAnioFabricacion.Focus();
+                return false;
+            }
+
+            // Titular: min 2 caracteres
+            string titular = (txtTitular.Text ?? "").Trim();
+            if (titular.Length < 2 || titular.Length > 30)
+            {
+                MessageBox.Show("El titular debe tener entre 2 y 30 caracteres.", "Error de validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtTitular.Focus();
+                return false;
+            }
+
+            return true;
         }
 
         private bool buscarTurno(int nroTurno)
@@ -104,61 +148,77 @@ namespace pryDeganiSp3._1
 
         private void btnRegistrar_Click(object sender, EventArgs e)
         {
+            // 1) tope de capacidad
+            if (indice >= MAX)
+            {
+                MessageBox.Show("Se ha alcanzado la cantidad maxima de turnos", "Atención",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2) validar datos (ver versión corregida abajo)
             if (validarDatosIngresados())
             {
-                //cargar los datos en el arreglo
-                turnos[indice].numTurno = int.Parse(txtNumTurno.Text);
-                turnos[indice].Dominio = txtDominio.Text;
-                turnos[indice].anioFabricacion = int.Parse(numAnioFabricacion.Value.ToString());
-                turnos[indice].Titular = txtTitular.Text;
-                //incrementar el indice
-                indice++;
-                //informar exito de la operacion
-                if (indice == MAX)
+                // 3) convertir seguro
+                if (!int.TryParse(txtNumTurno.Text, out int nroTurno))
                 {
-                    MessageBox.Show("Se ha alcanzado la cantidad maxima de turnos", "Atencion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("El número de turno debe ser un entero.", "Error de validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtNumTurno.Focus();
+                    return;
                 }
 
-                MessageBox.Show("Turno registrado correctamente", "Registro Exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                //limpiar controles para nuevo ingreso
+                // 4) cargar
+                turnos[indice].numTurno = nroTurno;
+                turnos[indice].Dominio = txtDominio.Text.Trim().ToUpperInvariant();
+                turnos[indice].anioFabricacion = (int)numAnioFabricacion.Value;
+                turnos[indice].Titular = txtTitular.Text.Trim();
+
+                indice++;
+
+                if (indice == MAX)
+                {
+                    MessageBox.Show("Se ha alcanzado la cantidad maxima de turnos", "Atención",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                MessageBox.Show("Turno registrado correctamente", "Registro Exitoso",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
                 LimpiarControles();
             }
         }
 
         private void btnConsultar_Click(object sender, EventArgs e)
         {
-            // primer consulta: cantidad de turnos registrados
-            // se obtiene directamente de la variable 'Cantidad'
             txtCantidadTurnos.Text = indice.ToString();
 
-            // segunda consulta: se debe recorrer el arreglo y determinar
-            // el menor valor del campo 'AnioFabricacion'
-            int menor = int.MaxValue; // mayor valor posible
-            int pos;
-            // recorrer el arreglo hasta la posición con datos
-            for (pos = 0; pos < indice; pos++)
+            if (indice == 0)
             {
-                // comparar el valor del elemento en el arreglo
+                txtAnioAntiguo.Clear();
+                txtCantidadCaracter.Clear();
+                return;
+            }
+
+            int menor = int.MaxValue;
+            for (int pos = 0; pos < indice; pos++)
+            {
                 if (turnos[pos].anioFabricacion < menor)
                 {
-                    menor = turnos[pos].anioFabricacion; // guarda el menor valor
+                    menor = turnos[pos].anioFabricacion;
                 }
             }
-            // mostrar el resultado
-            txtCantidadCaracter.Text = menor.ToString();
+            txtAnioAntiguo.Text = menor.ToString();   // <<< CORREGIDO
 
-            // tercera consulta: cantidad de vehículos con dominio de 6 caracteres
-            int contador = 0; // contador en cero
-                              // recorrer el arreglo hasta la posición con datos
-            for (pos = 0; pos < indice; pos++)
+            int contador = 0;
+            for (int pos = 0; pos < indice; pos++)
             {
-                // controlar si la longitud del dominio es 6
-                if (turnos[pos].Dominio.Length == 6)
+                if ((turnos[pos].Dominio ?? "").Length == 6)
                 {
-                    contador++; // incrementar el contador
+                    contador++;
                 }
             }
-            // mostrar el resultado
+            txtCantidadCaracter.Text = contador.ToString();  // <<< CORREGIDO
         }
 
         private void txtNumTurno_KeyPress(object sender, KeyPressEventArgs e)
