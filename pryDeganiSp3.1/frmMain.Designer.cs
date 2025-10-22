@@ -34,8 +34,8 @@
             label4 = new Label();
             txtNumTurno = new TextBox();
             txtDominio = new TextBox();
-            txtTitulo = new TextBox();
-            numericUpDown1 = new NumericUpDown();
+            txtTitular = new TextBox();
+            numAnioFabricacion = new NumericUpDown();
             label5 = new Label();
             label6 = new Label();
             label7 = new Label();
@@ -47,7 +47,7 @@
             btnConsultar = new Button();
             grpRegistro = new GroupBox();
             grpEstadisticas = new GroupBox();
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numAnioFabricacion).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -93,6 +93,7 @@
             txtNumTurno.Name = "txtNumTurno";
             txtNumTurno.Size = new Size(72, 27);
             txtNumTurno.TabIndex = 4;
+            txtNumTurno.KeyPress += txtNumTurno_KeyPress;
             // 
             // txtDominio
             // 
@@ -101,24 +102,25 @@
             txtDominio.Name = "txtDominio";
             txtDominio.Size = new Size(125, 27);
             txtDominio.TabIndex = 5;
+            txtDominio.KeyPress += txtDominio_KeyPress;
             // 
-            // txtTitulo
+            // txtTitular
             // 
-            txtTitulo.Location = new Point(178, 132);
-            txtTitulo.MaxLength = 30;
-            txtTitulo.Name = "txtTitulo";
-            txtTitulo.Size = new Size(301, 27);
-            txtTitulo.TabIndex = 6;
+            txtTitular.Location = new Point(178, 132);
+            txtTitular.MaxLength = 30;
+            txtTitular.Name = "txtTitular";
+            txtTitular.Size = new Size(301, 27);
+            txtTitular.TabIndex = 6;
             // 
-            // numericUpDown1
+            // numAnioFabricacion
             // 
-            numericUpDown1.Location = new Point(178, 99);
-            numericUpDown1.Maximum = new decimal(new int[] { 2025, 0, 0, 0 });
-            numericUpDown1.Minimum = new decimal(new int[] { 1950, 0, 0, 0 });
-            numericUpDown1.Name = "numericUpDown1";
-            numericUpDown1.Size = new Size(84, 27);
-            numericUpDown1.TabIndex = 7;
-            numericUpDown1.Value = new decimal(new int[] { 1950, 0, 0, 0 });
+            numAnioFabricacion.Location = new Point(178, 99);
+            numAnioFabricacion.Maximum = new decimal(new int[] { 2025, 0, 0, 0 });
+            numAnioFabricacion.Minimum = new decimal(new int[] { 1950, 0, 0, 0 });
+            numAnioFabricacion.Name = "numAnioFabricacion";
+            numAnioFabricacion.Size = new Size(84, 27);
+            numAnioFabricacion.TabIndex = 7;
+            numAnioFabricacion.Value = new decimal(new int[] { 1950, 0, 0, 0 });
             // 
             // label5
             // 
@@ -180,7 +182,7 @@
             btnRegistrar.TabIndex = 14;
             btnRegistrar.Text = "Registrar";
             btnRegistrar.UseVisualStyleBackColor = false;
-            btnRegistrar.Click += this.btnRegistrar_Click;
+            btnRegistrar.Click += btnRegistrar_Click;
             // 
             // btnSalir
             // 
@@ -191,7 +193,7 @@
             btnSalir.TabIndex = 15;
             btnSalir.Text = "Salir";
             btnSalir.UseVisualStyleBackColor = false;
-            btnSalir.Click += this.button2_Click;
+            btnSalir.Click += btnSalir_Click;
             // 
             // btnConsultar
             // 
@@ -202,6 +204,7 @@
             btnConsultar.TabIndex = 16;
             btnConsultar.Text = "Consultar";
             btnConsultar.UseVisualStyleBackColor = false;
+            btnConsultar.Click += btnConsultar_Click;
             // 
             // grpRegistro
             // 
@@ -235,8 +238,8 @@
             Controls.Add(label7);
             Controls.Add(label6);
             Controls.Add(label5);
-            Controls.Add(numericUpDown1);
-            Controls.Add(txtTitulo);
+            Controls.Add(numAnioFabricacion);
+            Controls.Add(txtTitular);
             Controls.Add(txtDominio);
             Controls.Add(txtNumTurno);
             Controls.Add(label4);
@@ -247,7 +250,7 @@
             Controls.Add(grpEstadisticas);
             Name = "frmMain";
             Text = "Auto Test";
-            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numAnioFabricacion).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -260,8 +263,8 @@
         private Label label4;
         private TextBox txtNumTurno;
         private TextBox txtDominio;
-        private TextBox txtTitulo;
-        private NumericUpDown numericUpDown1;
+        private TextBox txtTitular;
+        private NumericUpDown numAnioFabricacion;
         private Label label5;
         private Label label6;
         private Label label7;
